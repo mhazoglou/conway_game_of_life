@@ -1,8 +1,12 @@
+use std::{thread, time};
+
 mod conway;
 
 fn main() {
+    let width = 40;
+    let height = 20;
     println!("Initializing simulation");
-    let sim = conway::Grid::new(17, 17);
+    let sim = conway::Grid::new(width, height);
     println!("Sucessfully initialized");
     
     println!("{}", sim);
@@ -16,7 +20,7 @@ fn main() {
                      0, 1, 0, 1, 0, 
                      0, 1, 1, 0, 0,
                      0, 0, 0, 0, 0];
-    */
+    
     /*
     // Decapentathlon (period 15) 11 by 18
     // people who don't know Greek call it Penta-decathlon
@@ -39,7 +43,7 @@ fn main() {
                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     */
-    
+    /*
     // Pulsar 17 by 17
     let state = vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -58,12 +62,12 @@ fn main() {
                      0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0,
                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    
+    */
     sim.set_state(&state);
     //drop(state);
     
     sim.eat_state(state);
-    
+    */
     println!("{}", sim);
     
     let sim2 = conway::Grid::new_like(&sim);
@@ -72,9 +76,13 @@ fn main() {
     sim2.print_state();
     
     println!("Let's see some evolution\n");
-    for _ in 0..30 {
+    for _ in 0..200 {
         sim.evolve();
         println!("{}", sim);
-        println!("");
+        //println!("");
+        
+        // Reset cursor to first line of the maze
+        println!("\x1b[{}F", height * 2 + 1 + 8);
+        thread::sleep(time::Duration::from_millis(100));
     }
 }

@@ -176,15 +176,21 @@ impl fmt::Display for Grid {
         // lucky me returning Result can use ? operator
         let step = self.refstep.borrow();
         write!(f, 
-               "Grid type: {{\n\n    width: {}, height: {}, step: {}\n", 
+               "Grid type: {{\n\n    width: {}, height: {}, step: {}\n\n", 
                self.width, self.height, step)?;
         let state = self.refstate.borrow();
         let mut row: Vec<u8> = vec![0; self.width as usize];
         for i in 0..self.height {
-            write!(f, "{}|\n", 
-                   &"|\u{2014}\u{2014}\u{2014}".repeat(self.width as usize)[..]
-                   )?;
-            //write!(f, "[")?;
+            if i == 0 {
+                write!(f, "┏━━━{}┓\n", 
+                    &"┳━━━".repeat((self.width - 1) as usize)[..]
+                    )?;
+            } else {
+                write!(f, "┣━━━{}┫\n", 
+                    &"╋━━━".repeat((self.width - 1) as usize)[..]
+                    )?;
+                //write!(f, "[")?;
+            }
             for (j, col) in row.iter_mut().enumerate() {
                 let idx = calc_idx_periodic(j as u32, i, 
                                             self.width,
@@ -192,17 +198,94 @@ impl fmt::Display for Grid {
                                            );
                 *col = state[idx];
                 if *col == 1 {
-                    write!(f, "| \u{25A0} ")?;
+                    write!(f, "┃ \u{25A0} ")?;
                 } else {
-                    write!(f, "|   ")?;
+                    write!(f, "┃   ")?;
                 }
             }
-            write!(f, "|\n")?;
-            // another unnecessary assignment to make warnings stop
+            write!(f, "┃\n")?;
             
             //write!(f, "{:?}\n", row)?;
         }
-        write!(f, "{}|\n\n}}\n", &"|\u{2014}\u{2014}\u{2014}".repeat(self.width as usize)[..])
-        // getting an annoying warning for no reason
+        write!(f, "┗━━━{}┛\n\n}}\n", &"┻━━━".repeat((self.width - 1) as usize)[..])
+        
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_glider() {
+        let sim = Grid::new(5, 5);
+        let state_0 = vec![0, 0, 0, 0, 0,
+                           0, 1, 0, 0, 0,
+                           0, 1, 0, 1, 0,
+                           0, 1, 1, 0, 0,
+                           0, 0, 0, 0, 0];
+        sim.eat_state(state_0);
+        
+        let state_1 = vec![0, 0, 0, 0, 0,
+                           0, 0, 1, 0, 0,
+                           1, 1, 0, 0, 0,
+                           0, 1, 1, 0, 0,
+                           0, 0, 0, 0, 0];
+        
+        let state_2 = vec![0, 0, 0, 0, 0,
+                           0, 1, 0, 0, 0,
+                           1, 0, 0, 0, 0,
+                           1, 1, 1, 0, 0,
+                           0, 0, 0, 0, 0];
+
+        let state_3 = vec![0, 0, 0, 0, 0,
+                           0, 0, 0, 0, 0,
+                           1, 0, 1, 0, 0,
+                           1, 1, 0, 0, 0,
+                           0, 1, 0, 0, 0];
+        
+        let state_4 = vec![0, 0, 0, 0, 0,
+                           0, 0, 0, 0, 0,
+                           1, 0, 0, 0, 0,
+                           1, 0, 1, 0, 0,
+                           1, 1, 0, 0, 0];
+        
+        sim.evolve();
+        assert_eq!(*sim.refstate.borrow(), state_1);
+        sim.evolve();
+        assert_eq!(*sim.refstate.borrow(), state_2);
+        sim.evolve();
+        assert_eq!(*sim.refstate.borrow(), state_3);
+        sim.evolve();
+        assert_eq!(*sim.refstate.borrow(), state_4);
+    }
+    
+    #[test]
+    fn test_set_state() {
+        let sim = Grid::new(5, 5);
+        let state_0 = vec![0, 0, 0, 0, 0,
+                           0, 1, 0, 0, 0,
+                           0, 1, 0, 1, 0,
+                           0, 1, 1, 0, 0,
+                           0, 0, 0, 0, 0];
+        sim.set_state(&state_0);
+        
+        assert_eq!(*sim.refstate.borrow(), state_0);
+    }
+    
+    #[test]
+    #[should_panic]
+    fn test_eat_state() {
+        let sim = Grid::new(5, 5);
+        let state_0 = vec![0, 0, 0, 0, 0,
+                           0, 1, 0, 0, 0,
+                           0, 1, 0, 1, 0,
+                           0, 1, 1, 0, 0,
+                           0, 0, 0, 0, 0];
+        sim.eat_state(state_0);
+        
+        
+        println!("{:?}", state_0);
     }
 }
