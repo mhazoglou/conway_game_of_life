@@ -4,7 +4,7 @@ mod conway;
 
 fn main() {
     let width = 40;
-    let height = 20;
+    let height = 40;
     println!("Initializing simulation");
     let sim = conway::Grid::new(width, height);
     println!("Sucessfully initialized");
@@ -76,13 +76,14 @@ fn main() {
     sim2.print_state();
     
     println!("Let's see some evolution\n");
-    for _ in 0..200 {
+    for _ in 0..500 {
         sim.evolve();
         println!("{}", sim);
         //println!("");
         
         // Reset cursor to first line of the maze
         println!("\x1b[{}F", height * 2 + 1 + 8);
-        thread::sleep(time::Duration::from_millis(100));
+        thread::sleep(time::Duration::from_millis(20));
     }
+    println!("{}", sim);
 }

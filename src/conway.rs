@@ -137,7 +137,7 @@ impl Grid{
         let tot_nodes = (self.width * self.height) as usize;
         if tot_nodes != len_new {
             panic!(
-            "The size of the input state is not the same as the width times height"
+            "The size of the input state is not the same as the width times height: {}.", tot_nodes as u32
             );
         }
         
@@ -156,7 +156,7 @@ impl Grid{
         let tot_nodes = (self.width * self.height) as usize;
         if tot_nodes != len_new {
             panic!(
-            "The size of the input state is not the same as the width times height"
+            "The size of the input state is not the same as the width times height: {}.", tot_nodes as u32
             );
         }
         
@@ -205,9 +205,9 @@ impl fmt::Display for Grid {
             }
             write!(f, "┃\n")?;
             
-            //write!(f, "{:?}\n", row)?;
         }
-        write!(f, "┗━━━{}┛\n\n}}\n", &"┻━━━".repeat((self.width - 1) as usize)[..])
+        write!(f, "┗━━━{}┛\n\n}}\n", 
+            &"┻━━━".repeat((self.width - 1) as usize)[..])
         
     }
 }
@@ -275,17 +275,44 @@ mod tests {
     }
     
     #[test]
-    #[should_panic]
-    fn test_eat_state() {
+    #[should_panic(expected = "The size of the input state is not the same as the width times height: ")]
+    fn test_set_state_incorrect_size() {
         let sim = Grid::new(5, 5);
         let state_0 = vec![0, 0, 0, 0, 0,
                            0, 1, 0, 0, 0,
                            0, 1, 0, 1, 0,
                            0, 1, 1, 0, 0,
-                           0, 0, 0, 0, 0];
-        sim.eat_state(state_0);
-        
-        
-        println!("{:?}", state_0);
+                           0, 0, 0, 0];
+        sim.set_state(&state_0);
+    }
+    
+    #[test]
+    #[should_panic(expected = "Valid values can only be 0 or 1. Got value of ")]
+    fn test_set_state_invalid_state() {
+        let sim = Grid::new(5, 5);
+        let state_0 = vec![0, 0, 0, 0, 0,
+                           0, 2, 0, 0, 0,
+                           0, 3, 0, 4, 0,
+                           0, 5, 6, 0, 0,
+                           0, 0, 0, 0, 1];
+        sim.set_state(&state_0);
+    }
+    
+    #[test]
+    #[should_panic]
+    fn test_new_zero_size_width() {
+        let _sim = Grid::new(0, 5);
+    }
+    
+    #[test]
+    #[should_panic]
+    fn test_new_zero_size_height() {
+        let _sim = Grid::new(5, 0);
+    }
+    
+    #[test]
+    #[should_panic]
+    fn test_new_zero_size_width_and_height() {
+        let _sim = Grid::new(0, 0);
     }
 }
