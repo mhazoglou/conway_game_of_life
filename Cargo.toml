@@ -1,11 +1,15 @@
 [package]
 name = "conway_game_of_life"
 version = "0.1.0"
-authors = ["Michael Hazoglou"]
+authors = ["Michael Hazoglou", "Victoria Perrone"]
 edition = "2018"
 
 [dependencies]
 rand = "0.7.0"
+piston = "0.53.0"
+piston2d-graphics = "0.40.0"
+pistoncore-glutin_window = "0.69.0"
+piston2d-opengl_graphics = "0.78.0"
 
 [profile.dev]
 opt-level = 0
